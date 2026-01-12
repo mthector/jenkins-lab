@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: despliegue-web-jenkins
+spec:
+  replicas: 2               # Pondremos 2 copias de tu web
+  selector:
+    matchLabels:
+      app: web-jenkins
+  template:
+    metadata:
+      labels:
+        app: web-jenkins
+    spec:
+      containers:
+      - name: contenedor-web
+        image: mi-web-jenkins:v1  # <--- Esta es la imagen que acabamos de construir
+        imagePullPolicy: Never    # <--- IMPORTANTE: Le dice "No la busques en internet, úsala local"
+        ports:
+        - containerPort: 80
+
+---
+# Aquí abajo definimos el Servicio (Recepcionista) en el mismo archivo
+apiVersion: v1
+kind: Service
+metadata:
+  name: servicio-web-jenkins
+spec:
+  type: LoadBalancer
+  selector:
+    app: web-jenkins
+  ports:
+    - port: 80
+      targetPort: 80
